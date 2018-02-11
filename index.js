@@ -9,16 +9,6 @@ var db = NoSQL.load('db/bk.nosql');
 //choose = which shape was the user asked to identify
 //correct = did the user correctly identify bouba or kiki?
 
-db.view('raw').make(function(builder) {
-    // builder.where('sex', 'female');
-    builder.sort('date');
-});
-
-db.view('sort').make(function(builder) {
-    // builder.where('sex', 'female');
-    builder.sort('age');
-});
-
 var express = require('express'),
     app = express();
 var bodyParser = require('body-parser');
@@ -70,8 +60,6 @@ app.get('/results/by_age', function(req, res) {
     db.find()
     .callback(function(err, data) {
         var json = data.reduce(function(obj, d) {
-            // console.log(d);
-
             var bin = Math.trunc(d.age / 10);
             if (!obj[bin]) {
                 obj[bin] = {
@@ -82,31 +70,67 @@ app.get('/results/by_age', function(req, res) {
             obj[bin][d.correct]++;
 
             return obj;
-        }, {})
+        }, {});
         res.json(json);
     });
 });
 
-// app.get('/results/by_time', function(req, res) {
-//     db.find('all')
-//     // .search('name', 'Anna')
-//     .callback(function(err, data) {
-//         res.json(data);
-//     });
-// });
+app.get('/results/by_halftime', function(req, res) {
+    db.find().sort('date')
+    .callback(function(err, data) {
+        var json = data.reduce(function(obj, d, i) {
+            if ((i*2) < data.length) {
+                obj.first[d.correct]++;
+            } else {
+                obj.second[d.correct]++;
+            }
 
-// app.get('/results/by_order_flip', function(req, res) {
-//     db.find('all')
-//     // .search('name', 'Anna')
-//     .callback(function(err, data) {
-//         res.json(data);
-//     });
-// });
+            return obj;
+        }, {
+            first: {true: 0, false: 0},
+            second: {true: 0, false: 0}
+        });
+        res.json(json);
+    });
+});
 
-// app.get('/results/by_choice', function(req, res) {
-//     db.find('all')
-//     // .search('name', 'Anna')
-//     .callback(function(err, data) {
-//         res.json(data);
-//     });
-// });
+app.get('/results/by_order', function(req, res) {
+    db.find()
+    .callback(function(err, data) {
+        var json = data.reduce(function(obj, d) {
+            var key = [
+                (d.order) ? 'kiki' : 'bouba',
+                (d.flip) ? 'bouba' : 'kiki',
+                d.choose,
+            ].join('-');
+            if (!obj[key]) {
+                obj[key] = {
+                    "true": 0,
+                    "false": 0
+                }
+            }
+            obj[key][d.correct]++;
+
+            return obj;
+        }, {});
+        res.json(json);
+    });
+});
+
+app.get('/results/by_choice', function(req, res) {
+    db.find()
+    .callback(function(err, data) {
+        var json = data.reduce(function(obj, d) {
+            if (!obj[d.choose]) {
+                obj[d.choose] = {
+                    "true": 0,
+                    "false": 0
+                }
+            }
+            obj[d.choose][d.correct]++;
+
+            return obj;
+        }, {});
+        res.json(json);
+    });
+});
