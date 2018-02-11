@@ -34,24 +34,30 @@
                     }
                 });
                 $('path').click(function(){
-                    var result = 'Sorry you are wrong:(';
+                    // var result = 'Sorry you are wrong:(';
                     var correct = this.id === choose;
-                    if (correct) {
-                        result = 'Yay you are right!';
-                    }
-                    console.log(result);
+                    // if (correct) {
+                    //     result = 'Yay you are right!';
+                    // }
+                    // console.log(result);
                     var age = parseInt($('#age').val());
 
-                    var bk = [Date.now(), age, order, flip, choose, correct];
-                    console.log(bk)
-                    $.post(
-                        "/",
-                        bk,
-                        function(resp) {
-                            console.log(resp);
-                        },
-                        "json"
-                    );
+                    var bk = {
+                        date: Date.now(),
+                        age: age,
+                        order: order,
+                        flip: flip,
+                        choose: choose,
+                        correct: correct
+                    };
+                    $.ajax({
+                          type: 'POST',
+                          url: '/',
+                          data: JSON.stringify(bk),
+                          contentType: "application/json; charset=utf-8",
+                          success: function(){console.log("ok");},
+                          dataType: "json"
+                    });
                 });
 
                 var flip = Math.round(Math.random());
@@ -75,7 +81,6 @@
         </script>
     </head>
     <body>
-        <form>
             <div class="form-group">
                 <label for="age"><h2>How old are you?</h2></label>
                 <input type="number" class="form-control" id="age" placeholder="Enter your age">
@@ -110,6 +115,5 @@
                 </svg>
                 <h2 id="instruction"></h2>
             </div>
-        </form>
     </body>
 </html>
