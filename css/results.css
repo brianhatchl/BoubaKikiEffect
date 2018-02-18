@@ -1,0 +1,11 @@
+body {
+  font-family: Helvetica;
+  font-size: 10px;
+  background-color: #333333;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.rect {
+  fill: #222;
+}
