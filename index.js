@@ -75,8 +75,8 @@ app.get('/results/by_age', function(req, res) {
     });
 });
 
-app.get('/results/by_halftime', function(req, res) {
-    db.find().sort('date')
+function splitHalf(prop, callback) {
+    db.find().sort(prop)
     .callback(function(err, data) {
         var json = data.reduce(function(obj, d, i) {
             if ((i*2) < data.length) {
@@ -90,6 +90,19 @@ app.get('/results/by_halftime', function(req, res) {
             first: {true: 0, false: 0},
             second: {true: 0, false: 0}
         });
+        json.median = data[Math.trunc(data.length/2)][prop];
+        callback(json);
+    });
+}
+
+app.get('/results/by_halftime', function(req, res) {
+    splitHalf('date', function(json) {
+        res.json(json);
+    });
+});
+
+app.get('/results/by_halfage', function(req, res) {
+    splitHalf('age', function(json) {
         res.json(json);
     });
 });
