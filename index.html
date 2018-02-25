@@ -10,11 +10,31 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+        <!-- jQuery.NumPad -->
+        <script src="js/jquery.numpad.js"></script>
+        <link rel="stylesheet" href="css/jquery.numpad.css">
         <link rel="stylesheet" href="css/bk.css">
         <script type="text/javascript">
+            // Set NumPad defaults for jQuery mobile.
+            // These defaults will be applied to all NumPads within this document!
+            $.fn.numpad.defaults.gridTpl = '<table class="table modal-content"></table>';
+            $.fn.numpad.defaults.backgroundTpl = '<div class="modal-backdrop in"></div>';
+            $.fn.numpad.defaults.displayTpl = '<input type="text" class="form-control" />';
+            $.fn.numpad.defaults.buttonNumberTpl =  '<button type="button" class="btn btn-default"></button>';
+            $.fn.numpad.defaults.buttonFunctionTpl = '<button type="button" class="btn" style="width: 100%;"></button>';
+            $.fn.numpad.defaults.onKeypadCreate = function(){$(this).find('.done').addClass('btn-primary');};
             
             // Instantiate NumPad once the page is ready to be shown
             var init = function(){
+                $('#age').numpad({
+                    hidePlusMinusButton: true,
+                    hideDecimalButton: true,
+                    onKeypadClose: function(){
+                        if ($.isNumeric($(this).find('.nmpd-display').val()))
+                            $('div').toggleClass("hidden");
+                    }
+                });
+
                 $('path').click(function(){
                     // var result = 'Sorry you are wrong:(';
                     var correct = this.id === choose;
@@ -22,7 +42,7 @@
                     //     result = 'Yay you are right!';
                     // }
                     // console.log(result);
-                    var age = parseInt($('#age').val());
+                    var age = Number.parseInt($('#age').val());
 
                     var bk = {
                         date: Date.now(),
@@ -65,7 +85,11 @@
         </script>
     </head>
     <body>
-            <div class="image-choice ">
+            <div class="form-group">
+                <label for="age"><h2>How old are you?</h2></label>
+                <input type="number" class="form-control" id="age" placeholder="Enter your age">
+            </div>
+            <div class="image-choice hidden">
                 <h2 id="question"></h2>
                 <svg version="1.1" id="svg1" xmlns:svg="http://www.w3.org/2000/svg"
      xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="500px" height="255px"
